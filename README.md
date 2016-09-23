@@ -105,3 +105,73 @@ to
 ```
 return func.apply(this,Array.prototpye.slice.call(arguments).concat(args));
 ```
+#####Currying
+Currying is the process of transforming a function with many arguments into a function with one argument that returns another function that takes more arguments as needed.  
+A function with N arguments can be transformed into a function chain of N functions, each with only one argument.  
+
+Ex: deal with multi-tier(parentheses) arguments
+```
+Function.prototype.curry = function (numArgs) {
+  var func = this;
+  numArgs = numArgs || func.length;
+
+  // recursively acquire the arguments
+  function subCurry(prev) {
+    return function (arg) {   //returns a function with 1 more param, then recurse
+      var args = prev.concat(arg);
+      if (args.length < numArgs) {
+        // recursive case: we still need more args
+        return subCurry(args);
+      }
+      else {
+        // base case: apply the function
+        return func.apply(this, args);
+      }
+    };
+  }
+  return subCurry([]);    //must use array here
+};
+```
+call
+```
+var hexs = nums2hex.curry(2);
+console.log(hexs(11)(12));     // returns 0b0c
+console.log(hexs(11));         // returns function
+console.log(hexs(110)(12)(0)); // incorrect
+```
+####Function composition
+#####Compose
+###Chapter 7. Functional and Object-oriented Programming
+####JavaScript's object-oriented implementation – using prototypes
+A common mistake:
+```
+Foo.prototype = Object.create(Parent.prototype); // correct
+Bar.prototype = Object.create(Parent); // incorrect, Bar class may not call Parent's method defined in prototype
+```
+####Mixing functional and object-oriented programming in JavaScript
+#####Functional inheritance
+######Strategy Pattern
+######Mixins
+mixins are implemented as objects with only methods.(we use object,not functions)
+```
+var small = {
+  getPrice: function() {
+    return this.basePrice;   
+  },
+  getDimensions: function() {
+    return []
+  }
+}
+```
+classical addmixin
+```
+Shirt.prototype.addMixin = function (mixin) {
+  for (var prop in mixin) {
+    if (mixin.hasOwnProperty(prop)) {
+      this.prototype[prop] = mixin[prop];
+    }
+  }
+};
+```
+However this style is getting rewritten every time a mixin is added to it.
+######Functional mixins
